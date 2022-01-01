@@ -1,6 +1,11 @@
  const AWS = require('aws-sdk')
 
-// AWS.config.getenv();
+aws.config.update({
+  'credentials': {
+     'accessKeyId': process.env.AWS_ACCESS_KEY_ID_SQUAWK,
+     'secretAccessKey': process.env.AWS_SECRET_ACCESS_KEY_SQUAWK
+    },
+})
 
 const Polly = new AWS.Polly({
     signatureVersion: 'v4',
