@@ -1,16 +1,16 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react/cjs/react.development';
+import { useEffect, useState } from 'react';
 
 export default function Play() {
 
   const router = useRouter();
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState('');
   const [audioRef, setAudioRef] = useState()
 
   useEffect(() => {
     if(router.isReady) {
-      setUrl(router.query.url);
+      setUrl(router.query.url ?? '');
       if(audioRef) audioRef.load();
     }
   }, [router, setUrl, audioRef])
