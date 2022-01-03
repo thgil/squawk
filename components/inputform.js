@@ -11,17 +11,20 @@ export default function InputArea(props) {
   const [ audioString, setAudioString ] = useState('');
   const [ cost, setCost ] = useState(0);
   const [ audioUrl, setAudioUrl ] = useState('');
+  const [ loading, setLoading ] = useState(false)
   const [ error, setError ] = useState('');
+  const [ voice, setVoice ] = useState(0);
 
   const handleChange = (e) => {
     e.preventDefault();
     setAudioString(e.target.value);
-    setCost(Math.ceil(e.target.value.length/1000 * 3));
+    setCost(Math.ceil(e.target.value.length * 0.01));
+    setError('');
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(audioString);
+    setLoading(true);
 
     const mod = '<speak>'+audioString+'</speak>'
 
@@ -33,7 +36,8 @@ export default function InputArea(props) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        audioString: mod
+        audioString: mod,
+        voice: voice
       })
     });
 
@@ -41,6 +45,7 @@ export default function InputArea(props) {
 
     if(result.message) return setError(result.message);
     setAudioUrl(result.url);
+    setLoading(false)
 
     props.onAudioUrl(result.url);
   }
@@ -63,49 +68,30 @@ export default function InputArea(props) {
               >
                 Write
               </Tab>
-              <Tab
-                className={({ selected }) =>
-                  classNames(
-                    selected
-                      ? 'text-gray-900 bg-gray-100 hover:bg-gray-200'
-                      : 'text-gray-500 hover:text-gray-900 bg-white hover:bg-gray-100',
-                    'ml-2 px-3 py-1.5 border border-transparent text-sm font-medium rounded-md'
-                  )
-                }
-              >
-                Adjust
-              </Tab>
-
-              {/* These buttons are here simply as examples and don't actually do anything. */}
               {selectedIndex === 0 ? (
                 <div className="ml-auto flex items-center space-x-5">
-                  <div className="flex items-center">
+                  <span className="text-sm">Select voice:</span>
+                  <span className="relative z-0 inline-flex shadow-sm rounded-md">
                     <button
                       type="button"
-                      className="-m-2.5 w-10 h-10 rounded-full inline-flex items-center justify-center text-gray-400 hover:text-gray-500"
+                      onClick={() => { setVoice(0) }}
+                      selected={true}
+                      className={classNames(
+                        voice===0
+                        ? "z-10 ring-1 ring-indigo-500 border-indigo-500"
+                        : "",
+                        "relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
                     >
-                      <span className="sr-only">Insert link</span>
-                      <LinkIcon className="h-5 w-5" aria-hidden="true" />
+                      Female
                     </button>
-                  </div>
-                  <div className="flex items-center">
                     <button
                       type="button"
-                      className="-m-2.5 w-10 h-10 rounded-full inline-flex items-center justify-center text-gray-400 hover:text-gray-500"
+                      onClick={() => { setVoice(1) }}
+                      className="relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                     >
-                      <span className="sr-only">Insert code</span>
-                      <CodeIcon className="h-5 w-5" aria-hidden="true" />
+                      Male
                     </button>
-                  </div>
-                  <div className="flex items-center">
-                    <button
-                      type="button"
-                      className="-m-2.5 w-10 h-10 rounded-full inline-flex items-center justify-center text-gray-400 hover:text-gray-500"
-                    >
-                      <span className="sr-only">Mention someone</span>
-                      <AtSymbolIcon className="h-5 w-5" aria-hidden="true" />
-                    </button>
-                  </div>
+                  </span>
                 </div>
               ) : null}
             </Tab.List>
@@ -143,9 +129,14 @@ export default function InputArea(props) {
         <span className="text-sm mx-5">{audioString.length} / 250 characters </span>
         <button
           type="submit"
+          disabled={loading}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
-          Generate audio {cost == 0 ? '': `\$${(cost/100).toPrecision(1)}`}
+          { loading ? 
+          (<span>Loading...</span>)
+          : (<span>Generate audio {cost == 0 ? '': `\$${(cost/100).toFixed(2)}`}</span>)
+          
+          }
         </button>
       </div>
     </form>

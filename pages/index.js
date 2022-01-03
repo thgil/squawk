@@ -1,7 +1,7 @@
 import Head from 'next/head'
-import Image from 'next/image'
 
 import Hero from '../components/hero'
+import Pricing from '../components/pricing'
 
 export default function Home() {
   return (
@@ -15,6 +15,7 @@ export default function Home() {
 
       <main className="">
         <Hero></Hero>
+        <Pricing></Pricing>
       </main>
 
       <footer className="">
