@@ -18,7 +18,7 @@ export default async function email(req, res) {
     if(!email) throw new Error('Something went wrong');
     if(!validateEmail(email)) throw new Error('Not a valid email');
 
-    const result = await client.query(q.Create(q.Collection('subscriptions'), { data: { email: email }}))
+    const result = await client.query(q.Create(q.Collection('subscriptions'), { data: { email: email.toLowerCase() }}))
     .catch((err) => {
       throw new Error('Email already exists');
     })
