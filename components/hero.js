@@ -6,6 +6,7 @@ import Image from 'next/image'
 import InputForm from './inputform'
 import { useState } from 'react'
 import squawk from '../public/squawk.svg'
+import EmailDialog from './emaildialog'
 
 const navigation = [
   { name: 'Why Squawk', href: '#pricing' },
@@ -98,12 +99,7 @@ export default function Hero() {
                 </div>
                 <div className="hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0">
                   <span className="inline-flex rounded-md shadow">
-                    <a
-                      href="#"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:text-indigo-500"
-                    >
-                      Log in
-                    </a>
+                    <EmailDialog class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:text-indigo-500"></EmailDialog>
                   </span>
                 </div>
               </nav>
@@ -184,7 +180,7 @@ export default function Hero() {
             <div className="flex flex-col justify-center items-center relative bg-white rounded-lg shadow-lg p-8 sm:p-16">
               <div className="mb-8 text-center">
                 <h3 className="text-4xl tracking-tight text-gray-800 font-bold mb-2">Give it a shot!</h3>
-                <p className="text-md text-gray-500">Get your text narrated now or listen to some examples below.</p>
+                <p className="text-md text-gray-500">Narrate your text for <b>free</b> in our demo.</p>
               </div>
               <div className="bg-white w-full sm:max-w-2xl">
                 <InputForm onAudioUrl={handleAudioUrl}></InputForm>
@@ -209,9 +205,7 @@ export default function Hero() {
       </div>
       <div className="bg-gray-800">
         <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-          <h2 className="text-center text-gray-400 text-sm font-semibold uppercase tracking-wide">
-            Trusted by over 4 forward-thinking friends
-          </h2>
+            <img className="text-center mx-auto" src="https://d0.awsstatic.com/logos/powered-by-aws-white.png" alt="Powered by AWS Cloud Computing" />
           <div className="mt-8 grid grid-cols-2 gap-8 md:grid-cols-6 lg:grid-cols-5">
             {/* <div className="col-span-1 flex justify-center md:col-span-2 lg:col-span-1">
               <img className="h-12" src="https://tailwindui.com/img/logos/tuple-logo-gray-400.svg" alt="Tuple" />

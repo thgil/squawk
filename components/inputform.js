@@ -20,15 +20,14 @@ export default function InputArea(props) {
     setAudioString(e.target.value);
     setCost(Math.ceil(e.target.value.length * 0.01));
     setError('');
+    setLoading(false);
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const mod = '<speak>'+audioString+'</speak>'
-
-    const res = await fetch(`http://localhost:3000/api/speak`, {
+    const res = await fetch(`/api/speak`, {
       method: 'POST',
       mode: 'cors',
       SameSite: 'Strict',
@@ -36,18 +35,21 @@ export default function InputArea(props) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        audioString: mod,
+        audioString: audioString,
         voice: voice
       })
     });
 
     const result = await res.json();
 
-    if(result.message) return setError(result.message);
-    setAudioUrl(result.url);
     setLoading(false)
 
-    props.onAudioUrl(result.url);
+    if(result.message) {
+      setError(result.message);
+    } else {
+      setAudioUrl(result.url);
+      props.onAudioUrl(result.url);
+    }
   }
 
   return (
@@ -134,7 +136,7 @@ export default function InputArea(props) {
         >
           { loading ? 
           (<span>Loading...</span>)
-          : (<span>Generate audio {cost == 0 ? '': `\$${(cost/100).toFixed(2)}`}</span>)
+          : (<span>Narrate text <strike className="line-through decoration-1">{cost == 0 ? '': `\$${(cost/100).toFixed(2)}`}</strike></span>)
           
           }
         </button>

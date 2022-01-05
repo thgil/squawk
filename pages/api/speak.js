@@ -1,3 +1,5 @@
+import rateLimit from '../../utils/rate-limit'
+
 const AWS = require('aws-sdk')
 
 AWS.config.update({
@@ -14,50 +16,65 @@ const Polly = new AWS.Polly({
 
 const s3 = new AWS.S3();
 
-export default function Speak(req, res) {
+const limiter = rateLimit({
+  interval: 60 * 1000, // 60 seconds
+  uniqueTokenPerInterval: 100, // Max 500 users per second
+})
 
-  if(!req.body.audioString) return res.status(400).json('No string.');
+export default async function Speak(req, res) {
+  const length = 250;
+  const url = '';
+
+  await limiter.check(res, 5, 'CACHE_TOKEN')
+  .then( () => {
+    if(req.body.audioString == '') throw new Error('No string.');
+    if(req.body.audioString.length > length) throw new Error('Exceeds character limit:')
+
+    const text = '<speak>'+req.body.audioString+'</speak>';
+    const time = Date.now();
   
-  const length = 300;
+    const voice = req.body.voice == 0 ? 'Amy' : 'Matthew';
+  
+    // Due to AWS Polly character restrictions, we have to split our text into chunks.
+    // const splittedText = transcript.match(/.{1500}/g);
+    // then map(chunk, index) i
+    // then concat mp3 files with ffmpeg?
 
-  if(req.body.audioString.length > length) return res.status(400).json({message: 'Too many characters ( 250 limit for demo )'})
+    const pollyparams = {
+      'Text': text,
+      'TextType': "ssml", 
+      'OutputFormat': 'mp3',
+      'VoiceId': voice,
+      'Engine': 'neural'
+    };
 
-  const text = req.body.audioString;
-  const time = Date.now();
-
-  const voice = req.body.voice == 0 ? 'Amy' : 'Matthew';
-
-  const pollyparams = {
-    'Text': text,
-    'TextType': "ssml", 
-    'OutputFormat': 'mp3',
-    'VoiceId': voice,
-    'Engine': 'neural'
-}
-
-  Polly.synthesizeSpeech(pollyparams, (err, data) => {
+    Polly.synthesizeSpeech(pollyparams, (err, data) => {
       if (err) {
-          console.log(err.message)
-          res.status(400).json(err);
+        return res.status(400).json(err);
       } else if (data) {
-          let s3params = {
-              Body: data.AudioStream, 
-              Bucket: "pollysquawk", 
-              Key: String(time) + '.mp3',
-              // ACL: "public-read"
-          };
+        let s3params = {
+          Body: data.AudioStream, 
+          Bucket: "pollysquawk", 
+          Key: String(time) + '.mp3',
+        };
 
-          s3.upload(s3params, function(err, data) {
-              if (err) {
-                  console.log(err.message);
-                  res.status(400).json(err);
-              } else {    
-                  console.log(data.Location);
-                  res.json({
-                    url: data.Location
-                  });
-              }
-          });
+        s3.upload(s3params, function(err, data) {
+          if (err) {
+            return res.status(400).json(err);
+          } else {    
+            return res.json({
+              url: data.Location
+            });
+          }
+        });
       }
+    })
   })
+  .catch( (err) => {
+    console.log(err.message)
+    return res.status(400).json({ message: err.message });
+  })
+
+  return;
+  
 }

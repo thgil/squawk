@@ -1,12 +1,13 @@
 /* This example requires Tailwind CSS v2.0+ */
 import { CalendarIcon, CheckIcon, PlusIcon, RssIcon, NewspaperIcon, ViewListIcon, BookOpenIcon, VideoCameraIcon } from '@heroicons/react/outline'
+import EmailDialog from '../components/emaildialog'
 
 const features = [
   {
     name: 'Audiobook',
     icon: BookOpenIcon,
     description:
-      '<p style="margin-bottom:0.5rem;">Test</p><audio controls><source src="https://pollysquawk.s3.amazonaws.com/1641222291288.mp3" type=\"audio/mpeg\" /></audio>',
+      '<audio controls><source src="https://pollysquawk.s3.amazonaws.com/1641222291288.mp3" type=\"audio/mpeg\" /></audio>',
   },
   {
     name: 'Video',
@@ -31,7 +32,7 @@ const features = [
 const checklist = [
   'Pay as you go',
   'More voices',
-  'Speech Editor',
+  'Narration editor',
   'No text limit',
   'Cancel any time',
   'Narrate anything',
@@ -100,12 +101,7 @@ export default function Pricing() {
                 </li>
               ))}
             </ul>
-            <a
-              href="#"
-              className="bg-white border border-transparent rounded-md w-full px-8 py-4 flex items-center justify-center text-lg leading-6 font-medium text-indigo-600 hover:bg-indigo-50 md:px-10"
-            >
-              Get started today
-            </a>
+            <EmailDialog class="bg-white border border-transparent rounded-md w-full px-8 py-4 flex items-center justify-center text-lg leading-6 font-medium text-indigo-600 hover:bg-indigo-50 md:px-10"></EmailDialog>
             <a href="#" className="block text-center text-base font-medium text-indigo-200 hover:text-white">
               Try Squawk now.
             </a>

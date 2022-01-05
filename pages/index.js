@@ -11,6 +11,7 @@ export default function Home() {
         <meta name="description" content="Text to Speech" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css"></link>
+        <script defer data-domain="squawk-ivory.vercel.app" src="https://plausible.io/js/plausible.js"></script>
       </Head>
 
       <main className="">
