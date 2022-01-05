@@ -25,8 +25,12 @@ export default function InputArea(props) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
+    if(audioString.length < 2 ) return setError('Text too short');
+    if(audioString.length > 250 ) return setError('Exceeds demo character limit:');
+
+    setLoading(true);
+    
     const res = await fetch(`/api/speak`, {
       method: 'POST',
       mode: 'cors',
