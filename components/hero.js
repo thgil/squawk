@@ -23,7 +23,7 @@ export default function Hero() {
   }
 
   return (
-    <div className="bg-gray-50">
+    <div className="bg-slate-50">
       <div className="relative overflow-hidden">
         <div className="absolute inset-y-0 h-full w-full" aria-hidden="true">
           <div className="relative h-full">
@@ -177,12 +177,12 @@ export default function Hero() {
               src="https://tailwindui.com/img/component-images/top-nav-with-multi-column-layout-screenshot.jpg"
               alt="App screenshot"
             /> */}
-            <div className="flex flex-col justify-center items-center relative bg-white rounded-lg shadow-lg p-8 sm:p-16">
+            <div className="flex flex-col justify-center items-center relative bg-white rounded-lg shadow-2xl p-8 sm:p-16">
               <div className="mb-8 text-center">
                 <h3 className="text-4xl tracking-tight text-gray-800 font-bold mb-2">Give it a shot!</h3>
                 <p className="text-md text-gray-500">Narrate your text for <b>free</b> in our demo.</p>
               </div>
-              <div className="bg-white w-full sm:max-w-2xl">
+              <div className="w-full sm:max-w-2xl">
                 <InputForm onAudioUrl={handleAudioUrl}></InputForm>
                 { audioUrl && (
                   <div className="">
