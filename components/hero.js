@@ -23,7 +23,7 @@ export default function Hero() {
   }
 
   return (
-    <div className="bg-slate-50">
+    <div className="bg-gray-50">
       <div className="relative overflow-hidden">
         <div className="absolute inset-y-0 h-full w-full" aria-hidden="true">
           <div className="relative h-full">
@@ -162,6 +162,9 @@ export default function Hero() {
               <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
                 Pay as you go high quality speech
               </p>
+              <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+              <EmailDialog class="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10"></EmailDialog>
+            </div>
             </div>
           </div>
         </div>

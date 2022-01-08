@@ -107,11 +107,12 @@ export default function EmailDialog(props) {
                   We will launch soon!
                 </Dialog.Title>
                 <div className="mt-2">
-                  <p className="text-sm text-gray-500 mt-4 mb-1">
+                  <p className="text-sm text-gray-500 mt-4 mb-2">
                     We will send a <b>single</b> email when we launch.
                   </p>
                   <p className="text-sm text-gray-500 mb-4">
-                    Thank you for your support.
+                    You can try our demo while you wait.
+                    Thank you for your interest.
                   </p>
                   <form onSubmit={handleSubmit}>
                     <input id='email' value={email} onChange={handleChange}
