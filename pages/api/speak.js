@@ -1,5 +1,6 @@
+import { Client as FaunaClient, query as q } from "faunadb"
 import rateLimit from '../../utils/rate-limit'
-
+const { v1: uuidv1 } = require('uuid');
 const AWS = require('aws-sdk')
 
 AWS.config.update({
@@ -21,9 +22,14 @@ const limiter = rateLimit({
   uniqueTokenPerInterval: 100, // Max 500 users per second
 })
 
+const client = new FaunaClient({
+  secret: process.env.FAUNA_SECRET,
+  scheme: "https",
+  domain: "db.us.fauna.com"
+})
+
 export default async function Speak(req, res) {
   const length = 250;
-  const url = '';
 
   await limiter.check(res, 5, 'CACHE_TOKEN')
   .then( () => {
@@ -34,6 +40,7 @@ export default async function Speak(req, res) {
     const time = Date.now();
   
     const voice = req.body.voice == 0 ? 'Amy' : 'Matthew';
+
   
     // Due to AWS Polly character restrictions, we have to split our text into chunks.
     // const splittedText = transcript.match(/.{1500}/g);
@@ -55,13 +62,17 @@ export default async function Speak(req, res) {
         let s3params = {
           Body: data.AudioStream, 
           Bucket: "pollysquawk", 
-          Key: String(time) + '.mp3',
+          Key: uuidv1() + '.mp3',
         };
 
         s3.upload(s3params, function(err, data) {
           if (err) {
             return res.status(400).json(err);
-          } else {    
+          } else {
+            client.query(q.Create(q.Collection('texts'), { data: { length: text.length, text: text, voice: voice,  url: data.Location}}))
+            .catch((err) => {
+              throw new Error('Text could not be logged');
+            });
             return res.json({
               url: data.Location
             });
