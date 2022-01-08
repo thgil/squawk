@@ -79,8 +79,8 @@ export default async function Speak(req, res) {
         })
       });
     })
-    .then((url) => {
-      client.query(q.Create(q.Collection('texts'), { data: { length: text.length, text: text, voice: voice,  url: url}}));
+    .then(async (url) => {
+      await client.query(q.Create(q.Collection('texts'), { data: { length: text.length, text: text, voice: voice,  url: url}}));
       return res.json({
         url: url
       });
