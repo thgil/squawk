@@ -31,61 +31,62 @@ const client = new FaunaClient({
 export default async function Speak(req, res) {
   const length = 250;
 
+  const text = '<speak>'+req.body.audioString+'</speak>';
+  const voice = req.body.voice == 0 ? 'Amy' : 'Matthew';
+
   await limiter.check(res, 5, 'CACHE_TOKEN')
-  .then( () => {
-    if(req.body.audioString == '') throw new Error('No string.');
-    if(req.body.audioString.length > length) throw new Error('Exceeds character limit:')
+    .then( () => {
+      if(req.body.audioString == '') throw new Error('No string.');
+      if(req.body.audioString.length > length) throw new Error('Exceeds character limit:')
 
-    const text = '<speak>'+req.body.audioString+'</speak>';
-    const time = Date.now();
-  
-    const voice = req.body.voice == 0 ? 'Amy' : 'Matthew';
+      // Due to AWS Polly character restrictions, we have to split our text into chunks.
+      // const splittedText = transcript.match(/.{1500}/g);
+      // then map(chunk, index) i
+      // then concat mp3 files with ffmpeg?
 
-  
-    // Due to AWS Polly character restrictions, we have to split our text into chunks.
-    // const splittedText = transcript.match(/.{1500}/g);
-    // then map(chunk, index) i
-    // then concat mp3 files with ffmpeg?
+      const pollyparams = {
+        'Text': text,
+        'TextType': "ssml", 
+        'OutputFormat': 'mp3',
+        'VoiceId': voice,
+        'Engine': 'neural'
+      };
 
-    const pollyparams = {
-      'Text': text,
-      'TextType': "ssml", 
-      'OutputFormat': 'mp3',
-      'VoiceId': voice,
-      'Engine': 'neural'
-    };
+      return new Promise((resolve, reject) => {
+        Polly.synthesizeSpeech(pollyparams, (err, data) => {
+          if (err) {
+            reject(err);
+          } else if (data) {
+            resolve(data);
+          }
+        })
+      });
+    })
+    .then((data) => {
+      const s3params = {
+        Body: data.AudioStream, 
+        Bucket: "pollysquawk", 
+        Key: uuidv1() + '.mp3',
+      };
 
-    Polly.synthesizeSpeech(pollyparams, (err, data) => {
-      if (err) {
-        return res.status(400).json(err);
-      } else if (data) {
-        let s3params = {
-          Body: data.AudioStream, 
-          Bucket: "pollysquawk", 
-          Key: uuidv1() + '.mp3',
-        };
-
+      return new Promise((resolve, reject) => { 
         s3.upload(s3params, function(err, data) {
           if (err) {
-            return res.status(400).json(err);
+            reject(err);
           } else {
-            client.query(q.Create(q.Collection('texts'), { data: { length: text.length, text: text, voice: voice,  url: data.Location}}))
-            .catch((err) => {
-              throw new Error('Text could not be logged');
-            });
-            return res.json({
-              url: data.Location
-            });
+            resolve(data.Location)
           }
-        });
-      }
+        })
+      });
     })
-  })
-  .catch( (err) => {
-    console.log(err.message)
-    return res.status(400).json({ message: err.message });
-  })
-
-  return;
-  
+    .then((url) => {
+      client.query(q.Create(q.Collection('texts'), { data: { length: text.length, text: text, voice: voice,  url: url}}));
+      return res.json({
+        url: url
+      });
+    })
+    .catch( (err) => {
+      console.log(err.message)
+      return res.status(400).json({ message: err.message });
+    });
 }
